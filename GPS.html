@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+
+<script type="text/javascript" src="http://static.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js"></script>
+<script type="text/javascript" src="http://static.robotwebtools.org/roslibjs/current/roslib.min.js"></script>
+
+<script src="https://maps.googleapis.com/maps/api/js?callback=initMap"async defer></script>
+
+    
+<script type="text/javascript" type="text/javascript">
+    
+/*主要功能：显示车的轨迹，同时不要有叠加*/
+  var map;
+  let i0=-1;
+  let i1=-1;
+  let i2=-1;
+  let i3=-1;
+  let i4=-1;
+  let i5=-1;
+  let i6=-1;
+  // --------------------------------------------------------------------------------------------
+  let markers0 = [];
+  let markers1 = [];
+  let markers2 = [];
+  let markers3 = [];
+  let markers4 = [];
+  let markers5 = [];
+  let markers6 = [];
+ 
+  var carmarker0;
+  var carmarker1;
+  var carmarker2;
+  var carmarker3;
+  var carmarker4;
+  var carmarker5;
+  var carmarker6;
+
+  // --------------------------------------------------------------------------------------------
+  function initMap() {
+    console.log('map init.')
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: {lat: 49.025527, lng: 8.44856},
+      zoom: 19,
+      mapTypeId: "satellite"
+    });   
+    // used to record path
+    //PolylineCoordinates = []
+  }
+
+  // Connecting to ROS
+  // --------------------------------------------------------------------------------------------
+  var ros = new ROSLIB.Ros({
+    url : 'ws://localhost:9090'
+  });
+  ros.on('connection', function() {
+    console.log('Connected to websocket server.');
+  });
+  ros.on('error', function(error) {
+    console.log('Error connecting to websocket server: ', error);
+  });
+  ros.on('close', function() {
+    console.log('Connection to websocket server closed.');
+  });
+    
+  // Subscribe GPS Topic and Show
+  // --------------------------------------------------------------------------------------------
+  var gps_listener0 = new ROSLIB.Topic({
+    ros : ros,
+    name : '/kitti_gps_other0',
+    messageType : 'sensor_msgs/NavSatFix'
+  });
+  var gps_listener1 = new ROSLIB.Topic({
+    ros : ros,
+    name : '/kitti_gps_other1',
+    messageType : 'sensor_msgs/NavSatFix'
+  });
+  var gps_listener2 = new ROSLIB.Topic({
+    ros : ros,
+    name : '/kitti_gps_other2',
+    messageType : 'sensor_msgs/NavSatFix'
+  });
+  var gps_listener3 = new ROSLIB.Topic({
+    ros : ros,
+    name : '/kitti_gps_other3',
+    messageType : 'sensor_msgs/NavSatFix'
+  });
+  var gps_listener4 = new ROSLIB.Topic({
+    ros : ros,
+    name : '/kitti_gps_other4',
+    messageType : 'sensor_msgs/NavSatFix'
+  });
+  var gps_listener5 = new ROSLIB.Topic({
+    ros : ros,
+    name : '/kitti_gps_other5',
+    messageType : 'sensor_msgs/NavSatFix'
+  });
+  var gps_listener6 = new ROSLIB.Topic({
+    ros : ros,
+    name : '/kitti_gps_other6',
+    messageType : 'sensor_msgs/NavSatFix'
+  });
+  // var gps_listener2 = new ROSLIB.Topic({
+  //   ros : ros,
+  //   name : '/kitti_gps2',
+  //   messageType : 'sensor_msgs/NavSatFix'
+  // });
+
+  //----------------------------------------------------------------------------------------------
+  // gps_listener1.subscribe(function(msg) {
+  //   console.log('Received message on ' + gps_listener1.name + ': ' + msg.longitude + " " + msg.latitude);
+  //   document.getElementById('longitude').innerHTML = msg.longitude
+  //   document.getElementById('latitude').innerHTML = msg.latitude        
+  //   var latlng = new google.maps.LatLng(msg.latitude, msg.longitude);
+  //   i++;
+  //   map.setCenter(latlng);
+
+  //   const lineSymbol = {
+  //   path: google.maps.SymbolPath.CIRCLE,
+  //   scale: 4,
+  //   strokeColor: "#FF000",};
+
+  //  const carMarker1 = new google.maps.Marker({
+  //   position: { lat: msg.latitude, lng:msg.longitude },
+  //   map,
+  //   icon: lineSymbol,
+  //   });    
+  //   markers1.push(carMarker1);
+   
+  //  if(i>=1)markers1[i-1].setMap(null); 
+       
+  // });
+//------------------------------------------------------------------------------------------------
+ 
+// gps_listener2.subscribe(function(msg) {
+//     console.log('Received message on ' + gps_listener2.name + ': ' + msg.longitude + " " + msg.latitude);
+//     document.getElementById('longitude').innerHTML = msg.longitude
+//     document.getElementById('latitude').innerHTML = msg.latitude        
+//     var latlng = new google.maps.LatLng(msg.latitude, msg.longitude);
+//     i++;
+//     map.setCenter(latlng);
+
+//     const lineSymbol = {
+//     path: google.maps.SymbolPath.CIRCLE,
+//     scale: 4,
+//     strokeColor: "#FF000",};
+
+//    const carMarker2 = new google.maps.Marker({
+//     position: { lat: msg.latitude, lng:msg.longitude },
+//     map,
+//     icon: lineSymbol,
+//     });    
+//     markers2.push(carMarker2);
+   
+//    if(i>=1)markers2[i-1].setMap(null); 
+       
+//   });
+   function gpslistenersub(listen1, markerx , color ,carmarkerx,ix)
+   {
+    listen1.subscribe(function(msg) {
+    console.log('Received message on ' + listen1.name + ': ' + msg.longitude + " " + msg.latitude);
+    document.getElementById('longitude').innerHTML = msg.longitude
+    document.getElementById('latitude').innerHTML = msg.latitude        
+    var latlng = new google.maps.LatLng(msg.latitude, msg.longitude);
+    ix++;
+    
+
+    const lineSymbol = {
+    path: google.maps.SymbolPath.CIRCLE,
+    scale: 5,
+    strokeColor: color,};
+
+    var carmarkerx ;
+    carmarkerx = new google.maps.Marker({
+    position: { lat: msg.latitude, lng:msg.longitude },
+    map,
+    icon: lineSymbol,
+    });    
+    markerx.push(carmarkerx);
+   
+   if(ix>=1)markerx[ix-1].setMap(null); 
+       
+   });
+    }
+
+   gpslistenersub(gps_listener0,markers0,"#333",carmarker0,i0);
+   gpslistenersub(gps_listener1,markers1,"#485",carmarker1,i1);
+   gpslistenersub(gps_listener2,markers2,"#785",carmarker2,i2);
+   gpslistenersub(gps_listener3,markers3,"#654",carmarker3,i3);
+   gpslistenersub(gps_listener4,markers4,"#854",carmarker4,i4);
+   gpslistenersub(gps_listener5,markers5,"#120",carmarker5,i5);
+   gpslistenersub(gps_listener6,markers6,"#566",carmarker6,i6);
+    
+</script>
+    
+    
+<style>
+  /* Always set the map height explicitly to define the size of the div
+  * element that contains the map. */
+  #map {
+    height: 100%;
+  }
+  /* Optional: Makes the sample page fill the window. */
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+</style>
+
+</head>
+
+<body style="height: 100%">
+<!--   <h1>ROS GPS Example</h1> -->
+    
+  <div id="map"></div>
+    
+  <p id='longitude'>...longitude...</p>
+  <p id='latitude'>...latitude...</p>
+</body>
+</html>
